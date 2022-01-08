@@ -922,6 +922,10 @@ rtmp_client_t *rtmp_client_create(const char *url)
     rc->message_number = 0.0;
     rc->events = NULL;
 
+    // Chiro: fixed url
+    rc->url = (char *)malloc(sizeof(char) * strlen(url) + 1);
+    strcpy(rc->url, url);
+
     return rc;
 }
 
@@ -1008,6 +1012,8 @@ static void rtmp_client_parse_url(rtmp_client_t *rc, const char *url)
                 return;
             }
             strncpy(host_and_port_number, url + position, i);
+            // Chiro: fixed str
+            host_and_port_number[i] = '\0';
             rtmp_client_parse_host_and_port_number(
                 rc, host_and_port_number);
             free(host_and_port_number);
@@ -1026,6 +1032,8 @@ static void rtmp_client_parse_url(rtmp_client_t *rc, const char *url)
         return;
     }
     strncpy(rc->path, url + position, length);
+    // Chiro: fixed
+    rc->path[length] = '\0';
 #ifdef DEBUG
     printf("path: %s\n", rc->path);
 #endif
@@ -1036,6 +1044,7 @@ static void rtmp_client_parse_host_and_port_number(
     rtmp_client_t *rc, const char *host_and_port_number)
 {
     int i;
+    printf("host_and_port_number = %s\n", host_and_port_number);
 
     for (i = 0; host_and_port_number[i]; ++i) {
         if (host_and_port_number[i] == ':') {
@@ -1048,6 +1057,7 @@ static void rtmp_client_parse_host_and_port_number(
 	}
     }
     if (rc->host == NULL) {
+        printf("initing host...\n");
         rc->host = malloc(strlen(host_and_port_number) + 1);
         if (rc->host == NULL) {
             return;
